@@ -1,0 +1,136 @@
+// Version: 1.0.0
+type CollaborationInvitation__303065512 =
+  {
+    createdAt : Timestamp__301639476;
+    expiresAt : Timestamp__301639476;
+    id : InvitationId__630597167;
+    inviteeId : UserId__158757552;
+    inviterId : UserId__158757552;
+    role : CollaboratorRole__24846032;
+    status : InvitationStatus__862502148;
+    videoId : VideoId__498652803
+  };
+type CollaboratorRole__24846032 = {#editor; #viewer};
+type Collaborator__431220920 =
+  {
+    joinedAt : Timestamp__301639476;
+    role : CollaboratorRole__24846032;
+    userId : UserId__158757552;
+    videoId : VideoId__498652803
+  };
+type CollectionId__634139010 = Nat;
+type CollectionVisibility__573000288 = {#private_; #public_};
+type Collection__469474111 =
+  {
+    createdAt : Timestamp__301639476;
+    description : Text;
+    id : CollectionId__634139010;
+    ownerId : UserId__158757552;
+    title : Text;
+    updatedAt : Timestamp__301639476;
+    videoIds : [VideoId__498652803];
+    visibility : CollectionVisibility__573000288
+  };
+type CommentId__821569710 = Nat;
+type Comment__804484252 =
+  {
+    authorId : UserId__158757552;
+    createdAt : Timestamp__301639476;
+    id : CommentId__821569710;
+    text : Text;
+    timestampSeconds : Nat;
+    videoId : VideoId__498652803
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type ExternalBlob__246066408 = Blob;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type InvitationId__630597167 = Nat;
+type InvitationStatus__862502148 =
+  {#accepted; #declined; #expired; #pending; #revoked};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type Timestamp__301639476 = Int;
+type UserId__158757552 = Principal;
+type UserProfile__1009003526 =
+  {
+    bio : Text;
+    createdAt : Timestamp__301639476;
+    displayName : Text;
+    id : UserId__158757552;
+    profilePicture : ?ExternalBlob__246066408;
+    updatedAt : Timestamp__301639476
+  };
+type UserRole__1054455867 = {#admin; #guest; #user};
+type VideoId__498652803 = Nat;
+type VideoStatus__392091322 = {#available; #deleted};
+type VideoVisibility__415349696 = {#collaboratorsOnly; #private_; #public_};
+type Video__1048425805 =
+  {
+    createdAt : Timestamp__301639476;
+    description : Text;
+    durationSeconds : Nat;
+    id : VideoId__498652803;
+    status : VideoStatus__392091322;
+    thumbnailBlob : ?ExternalBlob__246066408;
+    title : Text;
+    updatedAt : Timestamp__301639476;
+    uploaderId : UserId__158757552;
+    videoBlob : ExternalBlob__246066408;
+    viewCount : Nat;
+    visibility : VideoVisibility__415349696
+  };
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable collaborators :
+    {
+      var root :
+        Node__46230540<(VideoId__498652803, UserId__158757552),
+                        Collaborator__431220920>;
+      var size : Nat__490723111
+    };
+  stable collectionIdCounter : {var value : Nat};
+  stable collections :
+    {
+      var root :
+        Node__46230540<CollectionId__634139010, Collection__469474111>;
+      var size : Nat__490723111
+    };
+  stable commentIdCounter : {var value : Nat};
+  stable comments :
+    {
+      var root : Node__46230540<CommentId__821569710, Comment__804484252>;
+      var size : Nat__490723111
+    };
+  stable invitationIdCounter : {var value : Nat};
+  stable invitations :
+    {
+      var root :
+        Node__46230540<InvitationId__630597167,
+                        CollaborationInvitation__303065512>;
+      var size : Nat__490723111
+    };
+  stable profiles :
+    {
+      var root : Node__46230540<UserId__158757552, UserProfile__1009003526>;
+      var size : Nat__490723111
+    };
+  stable videoIdCounter : {var value : Nat};
+  stable videos :
+    {
+      var root : Node__46230540<VideoId__498652803, Video__1048425805>;
+      var size : Nat__490723111
+    }
+};

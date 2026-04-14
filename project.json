@@ -1,0 +1,24 @@
+{
+  "overview": "An AI-generated video sharing platform where creators upload videos, manage collections, invite collaborators with role-based access, and track engagement through views and comments.",
+  "features": [
+    "Video upload and playback for AI-generated content",
+    "Browse and search video feed with thumbnails",
+    "Collaboration system with role-based access (Editor/Viewer)",
+    "Collections to organize videos by topic or project",
+    "Comments with timestamps and threaded replies",
+    "User profiles with dashboard and pending invites",
+    "Video visibility controls (public, private, collaborators-only)",
+    "View count tracking and engagement metrics"
+  ],
+  "category": "video-platform",
+  "tags": [
+    "video",
+    "ai",
+    "collaboration",
+    "youtube-like",
+    "content",
+    "sharing",
+    "platform"
+  ],
+  "last_updated": "2026-04-14T11:44:45.732Z"
+}

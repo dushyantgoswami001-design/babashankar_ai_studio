@@ -1,0 +1,221 @@
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type VideoVisibility = 
+ variant {
+   collaboratorsOnly;
+   private;
+   public;
+ };
+type VideoSummary = 
+ record {
+   createdAt: Timestamp;
+   description: text;
+   durationSeconds: nat;
+   id: VideoId;
+   status: VideoStatus;
+   thumbnailBlob: opt ExternalBlob;
+   title: text;
+   uploaderId: UserId;
+   viewCount: nat;
+   visibility: VideoVisibility;
+ };
+type VideoStatus = 
+ variant {
+   available;
+   deleted;
+ };
+type VideoId = nat;
+type Video = 
+ record {
+   createdAt: Timestamp;
+   description: text;
+   durationSeconds: nat;
+   id: VideoId;
+   status: VideoStatus;
+   thumbnailBlob: opt ExternalBlob;
+   title: text;
+   updatedAt: Timestamp;
+   uploaderId: UserId;
+   videoBlob: ExternalBlob;
+   viewCount: nat;
+   visibility: VideoVisibility;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = 
+ record {
+   bio: text;
+   createdAt: Timestamp;
+   displayName: text;
+   id: UserId;
+   profilePicture: opt ExternalBlob;
+   updatedAt: Timestamp;
+ };
+type UserId = principal;
+type UpdateVideoInput = 
+ record {
+   description: text;
+   title: text;
+   visibility: VideoVisibility;
+ };
+type UpdateCollectionInput = 
+ record {
+   description: text;
+   title: text;
+   visibility: CollectionVisibility;
+ };
+type Timestamp = int;
+type SaveProfileInput = 
+ record {
+   bio: text;
+   displayName: text;
+   profilePicture: opt ExternalBlob;
+ };
+type InvitationStatus = 
+ variant {
+   accepted;
+   declined;
+   expired;
+   pending;
+   revoked;
+ };
+type InvitationId = nat;
+type ExternalBlob = blob;
+type CreateVideoInput = 
+ record {
+   description: text;
+   durationSeconds: nat;
+   thumbnailBlob: opt ExternalBlob;
+   title: text;
+   videoBlob: ExternalBlob;
+   visibility: VideoVisibility;
+ };
+type CreateCommentInput = 
+ record {
+   "text": text;
+   timestampSeconds: nat;
+   videoId: VideoId;
+ };
+type CreateCollectionInput = 
+ record {
+   description: text;
+   title: text;
+   visibility: CollectionVisibility;
+ };
+type CommentId = nat;
+type Comment = 
+ record {
+   authorId: UserId;
+   createdAt: Timestamp;
+   id: CommentId;
+   "text": text;
+   timestampSeconds: nat;
+   videoId: VideoId;
+ };
+type CollectionVisibility = 
+ variant {
+   private;
+   public;
+ };
+type CollectionId = nat;
+type Collection = 
+ record {
+   createdAt: Timestamp;
+   description: text;
+   id: CollectionId;
+   ownerId: UserId;
+   title: text;
+   updatedAt: Timestamp;
+   videoIds: vec VideoId;
+   visibility: CollectionVisibility;
+ };
+type CollaboratorRole = 
+ variant {
+   editor;
+   viewer;
+ };
+type Collaborator = 
+ record {
+   joinedAt: Timestamp;
+   role: CollaboratorRole;
+   userId: UserId;
+   videoId: VideoId;
+ };
+type CollaborationInvitation = 
+ record {
+   createdAt: Timestamp;
+   expiresAt: Timestamp;
+   id: InvitationId;
+   inviteeId: UserId;
+   inviterId: UserId;
+   role: CollaboratorRole;
+   status: InvitationStatus;
+   videoId: VideoId;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  acceptInvitation: (invitationId: InvitationId) -> ();
+  addComment: (input: CreateCommentInput) -> (CommentId);
+  addVideoToCollection: (collectionId: CollectionId, videoId: VideoId) -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  canEdit: (videoId: VideoId) -> (bool) query;
+  createCollection: (input: CreateCollectionInput) -> (CollectionId);
+  declineInvitation: (invitationId: InvitationId) -> ();
+  deleteCollection: (id: CollectionId) -> ();
+  deleteComment: (commentId: CommentId) -> ();
+  deleteVideo: (id: VideoId) -> ();
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCollaborator: (videoId: VideoId, userId: UserId) ->
+   (opt Collaborator) query;
+  getCollection: (id: CollectionId) -> (opt Collection) query;
+  getProfile: () -> (opt UserProfile) query;
+  getUserProfile: (userId: UserId) -> (opt UserProfile) query;
+  getVideo: (id: VideoId) -> (opt Video);
+  inviteCollaborator: (videoId: VideoId, inviteeId: UserId, role:
+   CollaboratorRole) -> (InvitationId);
+  isCallerAdmin: () -> (bool) query;
+  listCollaborators: (videoId: VideoId) -> (vec Collaborator) query;
+  listCollectionsByOwner: (ownerId: UserId) -> (vec Collection) query;
+  listMyCollections: () -> (vec Collection) query;
+  listMyVideos: () -> (vec VideoSummary) query;
+  listPendingInvitations: () -> (vec CollaborationInvitation) query;
+  listRecentVideos: (limit: nat) -> (vec VideoSummary) query;
+  listTrendingVideos: (limit: nat) -> (vec VideoSummary) query;
+  listVideoComments: (videoId: VideoId) -> (vec Comment) query;
+  listVideosByUser: (uploaderId: UserId) -> (vec VideoSummary) query;
+  register: () -> ();
+  removeVideoFromCollection: (collectionId: CollectionId, videoId:
+   VideoId) -> ();
+  revokeCollaborator: (videoId: VideoId, targetUserId: UserId) -> ();
+  saveCallerUserProfile: (input: SaveProfileInput) -> ();
+  searchVideos: (searchTerm: text) -> (vec VideoSummary) query;
+  updateCollection: (id: CollectionId, input: UpdateCollectionInput) -> ();
+  updateProfile: (input: SaveProfileInput) -> ();
+  updateVideo: (id: VideoId, input: UpdateVideoInput) -> ();
+  uploadVideo: (input: CreateVideoInput) -> (VideoId);
+}
